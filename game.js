@@ -62,6 +62,9 @@ const RADII  = [0, 16, 30, 50];   // por tamaño 1, 2, 3
 const SPEEDS = [0, 85, 55, 32];   // velocidad base por tamaño
 const POINTS = [0, 100, 50, 20];  // puntos por tamaño
 
+const asteroidImg = new Image();
+asteroidImg.src = 'asteroid.png';
+
 class Asteroid {
   constructor(x, y, size = 3) {
     this.x    = x;
@@ -76,6 +79,7 @@ class Asteroid {
     this.vy = Math.sin(angle) * speed;
     this.rotSpeed = rand(-1.2, 1.2);
     this.rot = rand(0, Math.PI * 2);
+    this.useImg = Math.random() < 0.5;   // mitad con imagen, mitad con polígono
 
     // Polígono irregular
     const n = randInt(8, 13);
@@ -105,15 +109,20 @@ class Asteroid {
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.rot);
-    ctx.strokeStyle = '#fff';
-    ctx.lineWidth   = 1.5;
-    ctx.lineJoin    = 'round';
-    ctx.beginPath();
-    ctx.moveTo(this.verts[0][0], this.verts[0][1]);
-    for (let i = 1; i < this.verts.length; i++)
-      ctx.lineTo(this.verts[i][0], this.verts[i][1]);
-    ctx.closePath();
-    ctx.stroke();
+    if (this.useImg && asteroidImg.complete && asteroidImg.naturalWidth > 0) {
+      const d = this.radius * 2;
+      ctx.drawImage(asteroidImg, -this.radius, -this.radius, d, d);
+    } else {
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth   = 1.5;
+      ctx.lineJoin    = 'round';
+      ctx.beginPath();
+      ctx.moveTo(this.verts[0][0], this.verts[0][1]);
+      for (let i = 1; i < this.verts.length; i++)
+        ctx.lineTo(this.verts[i][0], this.verts[i][1]);
+      ctx.closePath();
+      ctx.stroke();
+    }
     ctx.restore();
   }
 }
